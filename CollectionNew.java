@@ -20,7 +20,7 @@ import org.bukkit.material.MaterialData;
 import de.luke.naruto.extras.Glow;
 import de.luke.naruto.extras.TestDatabase;
 
-public class Collection implements Listener {
+public class CollectionNew implements Listener {
 
 	static ItemStack commonMaterialGlow;
 	static ItemStack commonMaterial;
@@ -87,6 +87,9 @@ public class Collection implements Listener {
 
 	@SuppressWarnings("deprecation")
 	public static void Build() {
+
+		ArrayList<ItemData> itemDatas = new ArrayList<ItemData>();
+		itemDatas.add(new ItemData(Material.WORKBENCH, 0, "§f§lCraft"));
 
 		Workbench = new MaterialData(Material.WORKBENCH, (byte) 0).toItemStack(1);
 		Workbenchim = Workbench.getItemMeta();
@@ -519,60 +522,48 @@ public class Collection implements Listener {
 
 		if (event.getCurrentItem().getItemMeta() == null)
 			return;
-		
-		
 
 		if (event.getCurrentItem().getItemMeta().getDisplayName().contains("Throwing Knife")) {
 			ArrowInventory(player);
-		    return;
+			return;
 		}
-		
-		
-		
-		
 
 		if ((event.getCurrentItem().getItemMeta().getDisplayName().contains("Craft"))
 				&& (event.getClickedInventory().getName().contains("Throwing Knife"))) {
 			ArrowCraft(player);
 			return;
 		}
-		
-		
-		
 
 		if ((event.getCurrentItem().getItemMeta().getDisplayName().contains("Claim"))
 				&& (event.getClickedInventory().getName().contains("Throwing Knife")))
 			Claim(player);
-		
-		
 
 	}
 
 	private void Claim(Player player) throws SQLException {
 		int arrownumber;
 		PreparedStatement st;
-		st = TestDatabase.mysql.getConnection().prepareStatement(
-				"SELECT `number` FROM `Arrow` WHERE uuid = \"" + player.getUniqueId() + "\"");
+		st = TestDatabase.mysql.getConnection()
+				.prepareStatement("SELECT `number` FROM `Arrow` WHERE uuid = \"" + player.getUniqueId() + "\"");
 
 		ResultSet rs = st.executeQuery();
 		rs.next();
 		arrownumber = rs.getInt("number");
-		if (arrownumber < 1) 
+		if (arrownumber < 1)
 			return;
-		
+
 		int arrowslot = getArrowSlot(player);
-		
-		if (arrowslot==-1)
+
+		if (arrowslot == -1)
 			return;
-		
-	
-		
+
 		player.getInventory().addItem(Arrow);
-		st = TestDatabase.mysql.getConnection().prepareStatement("UPDATE `Arrow` SET `number` = ((Select `number` WHERE uuid =\"" + player.getUniqueId()
-		+ "\")-1) WHERE uuid = \"" + player.getUniqueId() + "\"");
+		st = TestDatabase.mysql.getConnection()
+				.prepareStatement("UPDATE `Arrow` SET `number` = ((Select `number` WHERE uuid =\""
+						+ player.getUniqueId() + "\")-1) WHERE uuid = \"" + player.getUniqueId() + "\"");
 		st.execute();
 		ArrowInventory(player);
-		
+
 	}
 
 	private void ArrowCraft(Player player) throws SQLException {
@@ -595,10 +586,9 @@ public class Collection implements Listener {
 
 		st.execute();
 
-
-
-		st = TestDatabase.mysql.getConnection().prepareStatement("UPDATE `Arrow` SET `number` = ((Select `number` WHERE uuid =\"" + player.getUniqueId()
-		+ "\")+1) WHERE uuid = \"" + player.getUniqueId() + "\"");
+		st = TestDatabase.mysql.getConnection()
+				.prepareStatement("UPDATE `Arrow` SET `number` = ((Select `number` WHERE uuid =\""
+						+ player.getUniqueId() + "\")+1) WHERE uuid = \"" + player.getUniqueId() + "\"");
 		st.execute();
 
 		ArrowInventory(player);
@@ -647,7 +637,7 @@ public class Collection implements Listener {
 	public static int getArrowSlot(Player player) {
 		for (int i = 0; i < 36; i++) {
 			ItemStack slot = player.getInventory().getItem(i);
-			if (slot.getType() != Material.AIR || (slot.getType() != Material.ARROW && slot.getAmount()<64))
+			if (slot.getType() != Material.AIR || (slot.getType() != Material.ARROW && slot.getAmount() < 64))
 				return i;
 		}
 		return -1;
